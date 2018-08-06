@@ -1,19 +1,19 @@
 # Cloning the Linux kernel source code
-##git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
 
 cd linux-stable
 # Using the 4.14 version of the kernel. Versions up to 4.16 should work, but 4.17 does not support clang 7 or under.
-##git checkout v4.14.34
+git checkout v4.14.34
 # Create a .config file with the default configuration for the current architecture
 # It is possible to edit this configuration with make menuconfig or copy an existing one
-##make defconfig
+make defconfig
 #cp ../miniconfig_x64 .config   # Uncommenting will use a smaller configuration for x86_64
 
 # Building the kernel. A bug makes the build stop randomly with clang, so we start it again if it is not finished
 # However, this will loop if there is an actual error.
-##while [ ! -e "vmlinux" ]; do
-   ## make vmlinux CC=gclang
-##done
+while [ ! -e "vmlinux" ]; do
+    make vmlinux CC=gclang
+done
 
 # The python script will extract the bitcode to the specified folder and link it all in a new vmlinux object
 # It needs the gclang log to be forwarded to this specific path. It can be changed in the python code. 
