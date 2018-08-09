@@ -7,3 +7,4 @@ Make sure you have [OCCAM](https://github.com/SRI-CSL/OCCAM) installed.
 
 Copy the scripts into the folder where you have your bitcode stored after running the built-in-parsing script (bitcode-build if you ran the example build). 
 I have included a list of all syscalls + start_kernel in [syscall.list](syscall.list). You can add the global variables missing from it by running [loop-add-globals.sh](loop-add-globals.sh) or expand from the [excluded.list](excluded.list) that I built for my kernel configuration.
+Launching [add-missing-globals.sh](add-missing-globals.sh) will do one pass, which should be enough if you are using exclude.list. It is them possible to copy vmlinux into the linux-stable directory and finish the build.
