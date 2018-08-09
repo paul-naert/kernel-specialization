@@ -20,8 +20,8 @@ done
 mkdir wrapper-logs
 export WLLVM_OUTPUT_FILE=wrapper-logs/wrapper.log
 mkdir ../bitcode-build
-python ../built-in-parsing.py ../bitcode-build drivers fs/ext4  
-# Currently, the kernel will not boot if i use the bitcode for the drivers and ext4 file system, so I exclude those folders
+python ../built-in-parsing.py ../bitcode-build 
+# When using the modular script, the kernel will not boot if i use the bitcode for the drivers and ext4 file system
 
 # This script created with the previous command will copy the bitcode files and link them
 bash build_script.sh
