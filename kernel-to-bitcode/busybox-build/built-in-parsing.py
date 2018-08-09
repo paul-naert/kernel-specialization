@@ -9,9 +9,7 @@
 import sys,os
 import subprocess
 
-arg_list="-Qunused-arguments -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -mno-80387 -mstack-alignment=8 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_CRC32=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1 -pipe  -fno-asynchronous-unwind-tables -O2 -fno-stack-protector  -mno-global-merge -no-integrated-as -fomit-frame-pointer  -fno-strict-overflow -fno-merge-all-constants -fno-stack-check"
-
-mini_arg_list="-no-integrated-as -mcmodel=kernel -O2"
+arg_list="-Qunused-arguments -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -mno-80387 -mstack-alignment=8 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_CRC32=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1 -pipe  -fno-asynchronous-unwind-tables -O2 -fno-stack-protector  -mno-global-merge -no-integrated-as -fomit-frame-pointer  -fno-strict-overflow -fno-merge-all-constants -fno-stack-check -nostdlib"
 
 # This is where most of the script gets written.
 # This function takes as argument:
@@ -65,7 +63,6 @@ def write_script(excluded_paths, depth, base_dir):
                     dir_created=1
                 out.writelines("get-bc -b "+base_dir+direc+"\n")
                 out.writelines("cp "+ base_dir+direc+".bc $build_home/built-ins/"+base_dir+"objects \n")
-                out.writelines("clang -c "+ arg_list+" -o $build_home/built-ins/"+base_dir+ direc + " $build_home/built-ins/"+base_dir+"objects/" + direc+".bc \n \n")
                 # We then add it to the linker arguments file
                 link_args.writelines("built-ins/"+base_dir + direc +" ")
             # When dealing with a folder, we get the bitcode from the built-in.o file and check for errors in the log.
@@ -97,9 +94,7 @@ def write_script(excluded_paths, depth, base_dir):
                 # Deal with the rest
                 if os.path.isfile(base_dir + direc +"/built-in.o.a.bc"):
                     out.writelines("cp "+ base_dir + direc +"/built-in.o.a.bc $build_home/built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc \n")
-                    out.writelines("clang -c " + arg_list +"  -o $build_home/built-ins/"+ base_dir + direc.replace('/','_') + "bibc.o $build_home/built-ins/" + base_dir+direc.replace('/','_')+"bi.o.bc \n \n")
-                    link_args.writelines("built-ins/"+base_dir + direc.replace('/','_') +"bibc.o ")
-                    llvm_link.writelines("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc ")
+                    link_args.writelines("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc ")
 
                 builtin.close()
 
@@ -131,7 +126,6 @@ for path in excluded_dirs:
 
 out = open("build_script.sh","w+")
 link_args = open(build_dir+"link-args","w+")
-llvm_link = open(build_dir+"llvm_link","w+")
 out.writelines("# Script written by the built-in-parsing.py script \n")
 out.writelines("export build_home="+build_dir+"\n")
 
@@ -146,7 +140,6 @@ write_script(excluded,0,"")
 out.writelines("get-bc -b lib/lib.a \n ")
 out.writelines("mkdir -p $build_home/lib\n")
 out.writelines("cp lib/lib.a.bc $build_home/lib/ \n")
-out.writelines("clang -c " + arg_list +"  -o $build_home/lib/lib.a.o $build_home/lib/lib.a.bc \n")
 
 if os.path.isfile("./wrapper-logs/wrapper.log"):
     os.rename("./wrapper-logs/wrapper.log","./wrapper-logs/before_lib.log")
@@ -165,7 +158,6 @@ for asf in assembly_objects:
     #link_args.writelines("arch/x86/lib/objects/" +filename+" ") ##ignored to keep the order of linked files
  
 out.writelines("cp arch/x86/lib/lib.a.bc $build_home/arch/x86/lib/lib.a.bc \n")
-out.writelines("clang -c " + arg_list +"  -o $build_home/arch/x86/lib/lib.a.o $build_home/arch/x86/lib/lib.a.bc \n \n")
 
 #Deal with individual files 
 out.writelines("cp arch/x86/kernel/vmlinux.lds $build_home \n")
@@ -177,8 +169,8 @@ out.writelines("\n#linking command \n")
 out.writelines("cd $build_home \n")
 
 # Final linking command
-out.writelines("ld --build-id -T vmlinux.lds --whole-archive ")
+out.writelines("clang -Wl,-T,vmlinux.lds,--whole-archive " +arg_list+" ")
 for sto in standalone_objects:
     out.writelines(sto+" ")
 out.writelines("@link-args ")
-out.writelines("--no-whole-archive --start-group lib/lib.a.o arch/x86/lib/lib.a.o arch/x86/lib/objects/*  .tmp_kallsyms2.o --end-group -o vmlinux")
+out.writelines(" lib/lib.a.bc arch/x86/lib/lib.a.bc arch/x86/lib/objects/*  .tmp_kallsyms2.o -o vmlinux")
