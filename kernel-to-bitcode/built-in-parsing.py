@@ -47,8 +47,6 @@ def write_script(excluded_paths, depth, base_dir):
 
             # Check if we have an excluded folder
             if base_dir+direc in excluded_dirs:
-                #out.writelines("convert-thin-archive.sh "+base_dir+direc+"/built-in.o \n")
-                #out.writelines("cp "+ base_dir +direc+"/built-in.o.new $build_home/built-ins/"+base_dir+direc+"bi.o \n \n")
                 link_args.writelines(os.getcwd()+"/" +base_dir + direc +"/built-in.o ")
             # Else we filter the excluded_path list for only relevant stuff and we call the recursion on that folder
             else:
