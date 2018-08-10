@@ -1,6 +1,6 @@
 
 ferr=open("errlog")
-flist=open("OCCAM/exclude.list","a")
+flist=open("OCCAM/trimmed.list","a")
 undef=0
 l=ferr.readline()
 added=[]
