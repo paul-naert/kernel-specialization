@@ -13,4 +13,4 @@ I have added [large.list](large.list) which allows the kernel to boot when slash
 
 [extract-keywords.py](extract-keywords.py) will print the most used keywords, and [trim-list.py](trim-list.py) will delete from the list the symbols including the string it is given as second argument.
 
-The trim-list and parse-errlog scripts bith take the name of the target list as first argument.
+The trim-list and parse-errlog scripts both take the name of the target list as first argument.
