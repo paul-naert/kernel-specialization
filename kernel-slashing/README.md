@@ -11,4 +11,6 @@ Launching [add-missing-globals.sh](add-missing-globals.sh) will do one pass, whi
 
 I have added [large.list](large.list) which allows the kernel to boot when slashed with this exclusion list. However, for now it is huge and most of the entries are not necessary. I have built that list by adding the full nm for the original nm to a list, and then excluding categories. The way I do this is by parsing the file and determining what keywords appear most frequently, and trying to exclude all lines including those. However, this reaches its limits very fast. I was able to take out acpi, ata, ksymtab, kstrtab and netlink for a total of 14000 lines. However, it does not allow me to take out init pci or attr, which make a big portion of the remaining names.
 
-[extract-keywords.py](extract-keywords.py) will print the most used keywords, and trim-list will delete from trimmed.list the symbols including the string it is given as argument.
+[extract-keywords.py](extract-keywords.py) will print the most used keywords, and [trim-list.py](trim-list.py) will delete from the list the symbols including the string it is given as second argument.
+
+The trim-list and parse-errlog scripts bith take the name of the target list as first argument.
