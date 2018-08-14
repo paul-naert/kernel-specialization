@@ -1,14 +1,15 @@
 import sys
 from shutil import copyfile
 
-copyfile("OCCAM/trimmed.list", "OCCAM/previous.list")
+trimmed_list=sys.argv[1]
+copyfile(trimmed_list, "previous.list")
 
 
-fout=open("OCCAM/trimmed.list","w+")
-flist=open("OCCAM/previous.list","r")
+fout=open(trimmed_list,"w+")
+flist=open("previous.list","r")
 l=flist.readline()
 count = 0
-exclude = sys.argv[1]
+exclude = sys.argv[2]
 while l:
     if not exclude in l:
         fout.write(l)

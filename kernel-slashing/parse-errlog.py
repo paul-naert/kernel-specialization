@@ -1,6 +1,6 @@
-
+import sys
 ferr=open("errlog")
-flist=open("OCCAM/trimmed.list","a")
+flist=open(sys.argv[1],"a")
 undef=0
 l=ferr.readline()
 added=[]
