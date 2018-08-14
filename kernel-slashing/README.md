@@ -7,7 +7,7 @@ Make sure you have [OCCAM](https://github.com/SRI-CSL/OCCAM) installed.
 
 Copy the scripts into the folder where you have your bitcode stored after running the built-in-parsing script (bitcode-build if you ran the example build). 
 I have included a list of all syscalls + start_kernel in [syscall.list](syscall.list). You can add the global variables missing from it by running [loop-add-globals.sh](loop-add-globals.sh) or expand from the [excluded.list](excluded.list) that I built for my kernel configuration. The manipulated list can be specified in [add-missing-globals.sh](add-missing-globals.sh) or you can copy the one you want in trimmed.list.
-Launching [add-missing-globals.sh](add-missing-globals.sh) will do one pass, which should be enough if you are using exclude.list. It is them possible to copy vmlinux into the linux-stable directory and finish the build.
+Launching [add-missing-globals.sh](add-missing-globals.sh) will do one pass, which should be enough if you are using exclude.list. It is then possible to copy vmlinux into the linux-stable directory and finish the build.
 
 I have added [large.list](large.list) which allows the kernel to boot when slashed with this exclusion list. However, for now it is huge and most of the entries are not necessary. I have built that list by adding the full nm for the original nm to a list, and then excluding categories. The way I do this is by parsing the file and determining what keywords appear most frequently, and trying to exclude all lines including those. However, this reaches its limits very fast. I was able to take out acpi, ata, ksymtab, kstrtab and netlink for a total of 14000 lines. However, it does not allow me to take out init pci or attr, which make a big portion of the remaining names.
 
