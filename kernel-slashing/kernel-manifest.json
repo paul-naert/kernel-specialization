@@ -1,8 +1,0 @@
-{ "main" :  "built-ins/initbi.o.bc"
-, "binary"  : "vmlinux"
-, "modules"    : ["built-ins/arch_x86bi.o.bc","built-ins/kernelbi.o.bc","built-ins/mmbi.o.bc","built-ins/fsbi.o.bc","built-ins/ipcbi.o.bc","built-ins/securitybi.o.bc","built-ins/cryptobi.o.bc","built-ins/blockbi.o.bc","built-ins/libbi.o.bc","built-ins/arch_x86_libbi.o.bc","built-ins/driversbi.o.bc","built-ins/arch_x86_pcibi.o.bc","built-ins/netbi.o.bc","lib/lib.a.bc","arch/x86/lib/lib.a.bc"]
-, "native_libs" : ["arch/x86/kernel/head_64.o","arch/x86/kernel/head_64.o","arch/x86/kernel/ebda.o","arch/x86/kernel/ebda.o","built-ins/usr/initramfs_data.o","built-ins/arch_x86/entry_64.o","built-ins/arch_x86/thunk_64.o","built-ins/arch_x86/vsyscall_emu_64.o","built-ins/arch_x86/rmpiggy.o","built-ins/lib/lib-ksyms.o","built-ins/arch_x86_lib/msr-reg.o","built-ins/arch_x86_lib/hweight.o","built-ins/arch_x86_lib/iomap_copy_64.o","built-ins/arch_x86_lib/lib-ksyms.o","arch/x86/lib/objects/*",".tmp_kallsyms2.o"]
-, "ldflags" : ["-T vmlinux.lds"]
-, "args"    : []
-, "name"    : "kernel"
-}

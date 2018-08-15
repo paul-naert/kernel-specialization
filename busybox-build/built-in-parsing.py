@@ -100,7 +100,7 @@ def write_script(excluded_paths, depth, base_dir):
                 if os.path.isfile(base_dir + direc +"/built-in.o.a.bc"):
                     out.writelines("cp "+ base_dir + direc +"/built-in.o.a.bc $build_home/built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc \n")
                     link_args.writelines("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc ")
-                    final_link_args.writelines(slashing_dir+"/_built-ins_"+ base_dir + direc.replace('/','_') +"bi.o-final.bc ")
+                    final_link_args.writelines(slashing_dir+"/built-ins_"+ base_dir + direc.replace('/','_') +"bi.o-final.bc ")
                     manifest_bclist.append("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc")
 
 
@@ -135,7 +135,7 @@ for path in excluded_dirs:
 out = open("build_script.sh","w+")
 link_args = open(build_dir+"link-args","w+")
 final_link_args = open(build_dir+"link-args-final","w+")
-occam_manifest = open(build_dir+"manifest-kernel.json","w+")
+occam_manifest = open(build_dir+"kernel-manifest.json","w+")
 manifest_bclist=[]
 manifest_olist=[]
 
@@ -151,8 +151,8 @@ archbi=["lib","pci","video","power"]
 write_script(excluded,0,"")
 
 # Dealing with both lib files 
-link_args.write(" lib/lib.a.bc arch/x86/lib/lib.a.bc")
-final_link_args.write(slashing_dir+"/lib_lib.a.bc"+ slashing_dir+"/arch_x86_lib_lib.a.bc")
+link_args.write(" lib/lib.a.bc arch/x86/lib/lib.a.bc ")
+final_link_args.write(slashing_dir+"/lib_lib.a.bc "+ slashing_dir+"/arch_x86_lib_lib.a.bc ")
 
 out.writelines("get-bc -b lib/lib.a \n ")
 out.writelines("mkdir -p $build_home/lib\n")
@@ -199,18 +199,18 @@ out.writelines("@link-args ")
 out.writelines("-o vmlinux")
 
 # Manifest writing
-occam_manifest.write('{ "main" :  "../built-ins/initbi.o.bc"\n, "binary"  : "vmlinux"\n, "modules"    : [')
+occam_manifest.write('{ "main" :  "built-ins/initbi.o.bc"\n, "binary"  : "vmlinux"\n, "modules"    : [')
 
-for bc_ar in manifest_bclist[:-1]: #we exclude the last one for the comma
-    occam_manifest.write('"../'+bc_ar+'",')
-if manifest_bclist:
-    occam_manifest.write('"../'+manifest_bclist[-1]+'"')
+for bc_ar in manifest_bclist[1:-1]: #we exclude the last one for the comma, and the first one is initbi
+    occam_manifest.write('"'+bc_ar+'",')
+if len(manifest_bclist)>1:
+    occam_manifest.write('"'+manifest_bclist[-1]+'"')
 occam_manifest.write(']\n, "native_libs" : [')
 
 for obj in manifest_olist[:-1]:
-    occam_manifest.write('"../'+obj+'",')
+    occam_manifest.write('"'+obj+'",')
 if manifest_olist:
-    occam_manifest.write('"../'+manifest_olist[-1]+'"')
+    occam_manifest.write('"'+manifest_olist[-1]+'"')
 
 occam_manifest.write(']\n, "ldflags" : []\n, "args"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
 print "Preparation work done, launch the build_script.sh to start the extraction"
