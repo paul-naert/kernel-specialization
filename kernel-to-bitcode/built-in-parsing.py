@@ -11,6 +11,7 @@ import subprocess
 
 arg_list="-Qunused-arguments -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -mno-80387 -mstack-alignment=8 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_CRC32=1 -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_SHA1_NI=1 -DCONFIG_AS_SHA256_NI=1 -pipe  -fno-asynchronous-unwind-tables -O2 -fno-stack-protector  -mno-global-merge -no-integrated-as -fomit-frame-pointer  -fno-strict-overflow -fno-merge-all-constants -fno-stack-check -nostdlib"
 
+slashing_dir="slashing"
 # This is where most of the script gets written.
 # This function takes as argument:
 #    a list of path that should not be translated into bitcode
@@ -48,6 +49,7 @@ def write_script(excluded_paths, depth, base_dir):
             # Check if we have an excluded folder
             if base_dir+direc in excluded_dirs:
                 link_args.writelines(os.getcwd()+"/" +base_dir + direc +"/built-in.o ")
+                final_link_args.writelines(os.getcwd()+"/" +base_dir + direc +"/built-in.o ")
             # Else we filter the excluded_path list for only relevant stuff and we call the recursion on that folder
             else:
                 relevant_excluded = [path for path in excluded_paths if (path[depth]==direc and len(path)>depth+1) ]
@@ -63,6 +65,7 @@ def write_script(excluded_paths, depth, base_dir):
                 out.writelines("cp "+ base_dir+direc+".bc $build_home/built-ins/"+base_dir+"objects \n")
                 # We then add it to the linker arguments file
                 link_args.writelines("built-ins/"+base_dir + direc +" ")
+                final_link_args.writelines("built-ins/"+base_dir + direc +" ")
             # When dealing with a folder, we get the bitcode from the built-in.o file and check for errors in the log.
             # For each file that does not have a bitcode version (compiled straight from asse
             # mbly) we copy it into the build folder directly and add it to the linker args
@@ -89,10 +92,17 @@ def write_script(excluded_paths, depth, base_dir):
                     out.writelines("cp "+ asf + " $build_home/built-ins/" + base_dir +direc.replace('/','_') +"\n")
                     filename= asf.split('/')[-1]
                     link_args.writelines("built-ins/"+base_dir + direc.replace('/','_') +'/'+filename+" ")
+
+                    final_link_args.writelines("built-ins/"+base_dir + direc.replace('/','_') +'/'+filename+" ")
+
+                    manifest_olist.append("built-ins/"+base_dir + direc.replace('/','_') +'/'+filename)
                 # Deal with the rest
                 if os.path.isfile(base_dir + direc +"/built-in.o.a.bc"):
                     out.writelines("cp "+ base_dir + direc +"/built-in.o.a.bc $build_home/built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc \n")
                     link_args.writelines("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc ")
+                    final_link_args.writelines(slashing_dir+"/_built-ins_"+ base_dir + direc.replace('/','_') +"bi.o-final.bc ")
+                    manifest_bclist.append("built-ins/"+ base_dir + direc.replace('/','_') +"bi.o.bc")
+
 
                 builtin.close()
 
@@ -124,17 +134,26 @@ for path in excluded_dirs:
 
 out = open("build_script.sh","w+")
 link_args = open(build_dir+"link-args","w+")
+final_link_args = open(build_dir+"link-args-final","w+")
+occam_manifest = open(build_dir+"manifest-kernel.json","w+")
+manifest_bclist=[]
+manifest_olist=[]
+
 out.writelines("# Script written by the built-in-parsing.py script \n")
 out.writelines("export build_home="+build_dir+"\n")
 
+
 # List exceptions
-standalone_objects = ["arch/x86/kernel/head_64.o","arch/x86/kernel/head64.o","arch/x86/kernel/ebda.o","arch/x86/kernel/platform-quirks.o"]#,"usr/initramfs_data.o"]
+standalone_objects = ["arch/x86/kernel/head_64.o","arch/x86/kernel/head64.o","arch/x86/kernel/ebda.o","arch/x86/kernel/platform-quirks.o"]
 archbi=["lib","pci","video","power"]
 
 # Calling the main function
 write_script(excluded,0,"")
 
 # Dealing with both lib files 
+link_args.write(" lib/lib.a.bc arch/x86/lib/lib.a.bc")
+final_link_args.write(slashing_dir+"/lib_lib.a.bc"+ slashing_dir+"/arch_x86_lib_lib.a.bc")
+
 out.writelines("get-bc -b lib/lib.a \n ")
 out.writelines("mkdir -p $build_home/lib\n")
 out.writelines("cp lib/lib.a.bc $build_home/lib/ \n")
@@ -153,8 +172,10 @@ for line in llvm_log.readlines():
 for asf in assembly_objects:
     out.writelines("cp "+ asf + " $build_home/arch/x86/lib/objects/ \n")
     filename= asf.split('/')[-1]
-    #link_args.writelines("arch/x86/lib/objects/" +filename+" ") ##ignored to keep the order of linked files
- 
+    link_args.writelines("arch/x86/lib/objects/" +filename+" ") 
+    final_link_args.writelines("arch/x86/lib/objects/" +filename+" ") 
+    manifest_olist.append("arch/x86/lib/objects/" +filename+" ")
+
 out.writelines("cp arch/x86/lib/lib.a.bc $build_home/arch/x86/lib/lib.a.bc \n")
 
 #Deal with individual files 
@@ -166,11 +187,30 @@ out.writelines("\n#linking command \n")
 
 out.writelines("cd $build_home \n")
 
+
+link_args.write(" .tmp_kallsyms2.o")
+final_link_args.write(" .tmp_kallsyms2.o")
+manifest_olist.append(".tmp_kallsyms2.o")
 # Final linking command
 out.writelines("clang -Wl,-T,vmlinux.lds,--whole-archive " +arg_list+" ")
 for sto in standalone_objects:
     out.writelines(sto+" ")
 out.writelines("@link-args ")
-out.writelines(" lib/lib.a.bc arch/x86/lib/lib.a.bc arch/x86/lib/objects/*  .tmp_kallsyms2.o -o vmlinux")
+out.writelines("-o vmlinux")
 
+# Manifest writing
+occam_manifest.write('{ "main" :  "../built-ins/initbi.o.bc"\n, "binary"  : "vmlinux"\n, "modules"    : [')
+
+for bc_ar in manifest_bclist[:-1]: #we exclude the last one for the comma
+    occam_manifest.write('"../'+bc_ar+'",')
+if manifest_bclist:
+    occam_manifest.write('"../'+manifest_bclist[-1]+'"')
+occam_manifest.write(']\n, "native_libs" : [')
+
+for obj in manifest_olist[:-1]:
+    occam_manifest.write('"../'+obj+'",')
+if manifest_olist:
+    occam_manifest.write('"../'+manifest_olist[-1]+'"')
+
+occam_manifest.write(']\n, "ldflags" : []\n, "args"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
 print "Preparation work done, launch the build_script.sh to start the extraction"
