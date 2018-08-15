@@ -9,6 +9,8 @@ The kernel-to-bitcode folder contains scripts to build the Linux kernel and extr
 
 The kernel-slashing directory contains scripts used to apply OCCAM's razor on the kernel bitcode.
 
+## Environment
+All this was done inside a Virtual Machine running on VirtualBox 5.2.12. The OS used is Ubuntu 16.04.
 ---
 
 This material is based upon work supported by the National Science Foundation under Grant [ACI-1440800](http://www.nsf.gov/awardsearch/showAward?AWD_ID=1440800). Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
