@@ -1,4 +1,4 @@
-# SRI-naert
+# Kernel Specialization
 Documentation for my work at SRI
 
 The general goal of my work was to provide a way to package an application and the Linux kernel in a small virtual machine that could be easily shipped. The main idea was to get LLVM IR code for the application and the kernel and apply the existing OCCAM tool to prune as much unnecessary functions as possible. 
