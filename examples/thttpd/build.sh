@@ -11,7 +11,10 @@ gclang -O2 -DHAVE__PROGNAME=1 -DHAVE_FCNTL_H=1 -DHAVE_GRP_H=1 -DHAVE_MEMORY_H=1 
 
 get-bc thttpd
 slash --work-dir=slashing --keep-external=../keep.list ../thttpd.json 
-#should be executed by slash, but somehow thttpd-slash is missing
+
+# We parse the syscalls of thttp, but we don't use them as we have a pre slashed kerel.
+llvm-dis thttpd-final.bc
+python parse-syscalls.py thttpd-final.ll #will produce an app-syscalls.list that you can add to a whitelist
 
 cp slashing/thttpd-slash ../initramfs/bin/thttpd
 cd ../initramfs 
