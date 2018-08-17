@@ -153,6 +153,8 @@ write_script(excluded,0,"")
 # Dealing with both lib files 
 link_args.write(" lib/lib.a.bc arch/x86/lib/lib.a.bc ")
 final_link_args.write(slashing_dir+"/lib_lib.a.bc "+ slashing_dir+"/arch_x86_lib_lib.a.bc ")
+manifest_bclist.append("lib/lib.a.bc")
+manifest_bclist.append("arch/x86/lib/lib.a.bc")
 
 out.writelines("get-bc -b lib/lib.a \n ")
 out.writelines("mkdir -p $build_home/lib\n")
@@ -212,5 +214,5 @@ for obj in manifest_olist[:-1]:
 if manifest_olist:
     occam_manifest.write('"'+manifest_olist[-1]+'"')
 
-occam_manifest.write(']\n, "ldflags" : []\n, "args"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
+occam_manifest.write(']\n, "args" : []\n, "ldflags"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
 print "Preparation work done, launch the build_script.sh to start the extraction"

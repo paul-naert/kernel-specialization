@@ -1,0 +1,11 @@
+#!/bin/sh
+	
+/bin/mount -t proc none /proc
+/bin/mount -t sysfs sysfs /sys
+/sbin/mdev -s
+
+adduser nobody
+
+/usr/bin/setsid /bin/cttyhack /bin/sh
+clear
+exec /bin/sh

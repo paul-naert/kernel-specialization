@@ -214,5 +214,5 @@ for obj in manifest_olist[:-1]:
 if manifest_olist:
     occam_manifest.write('"'+manifest_olist[-1]+'"')
 
-occam_manifest.write(']\n, "ldflags" : []\n, "args"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
+occam_manifest.write(']\n, "args" : []\n, "ldflags"    : ["'+ arg_list +'"]\n, "name"    : "kernel" \n }')
 print "Preparation work done, launch the build_script.sh to start the extraction"

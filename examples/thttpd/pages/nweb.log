@@ -1,0 +1,12 @@
+ INFO: nweb starting:8181:4312
+ INFO: nweb starting:8181:4314
+ERROR: system call:bind Errno=98 exiting pid=4314
+ INFO: request:GET / HTTP/1.1**User-Agent: Wget/1.17.1 (linux-gnu)**Accept: */***Accept-Encoding: identity**Host: localhost:8181**Connection: Keep-Alive****:1
+ INFO: SEND:index.html:1
+ INFO: nweb starting:8181:4504
+ERROR: system call:bind Errno=98 exiting pid=4504
+ INFO: request:GET / HTTP/1.1**User-Agent: Wget/1.17.1 (linux-gnu)**Accept: */***Accept-Encoding: identity**Host: localhost:8181**Connection: Keep-Alive****:2
+ INFO: SEND:index.html:2
+ INFO: nweb starting:8181:1366
+ INFO: request:GET / HTTP/1.1**User-Agent: Wget/1.17.1 (linux-gnu)**Accept: */***Accept-Encoding: identity**Host: localhost:8181**Connection: Keep-Alive****:1
+ INFO: SEND:index.html:1

@@ -1,0 +1,7 @@
+{ "main" : "thttpd.bc"
+, "binary"  : "thttpd-slash"
+, "native_libs" : ["/home/pn/perso/musllvm/musllvm/lib/libc.a"]
+, "args"    : ["-dd thttpd-example"]
+, "name"    : "thttpd"
+, "ldflags" : ["-static","-nostdlib"]
+}
